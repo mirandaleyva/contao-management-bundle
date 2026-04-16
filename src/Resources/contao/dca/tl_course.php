@@ -21,7 +21,7 @@ $GLOBALS['TL_DCA']['tl_course'] = [
             'panelLayout' => 'sort,filter;search,limit',
         ],
         'label' => [
-            'fields' => ['name'],
+            'fields' => ['title'],
             'format' => '%s',
         ],
         'global_operations' => [
@@ -66,7 +66,7 @@ $GLOBALS['TL_DCA']['tl_course'] = [
         'sorting' => [
             'sql' => "int(10) unsigned NOT NULL default 0",
         ],
-        'name' => [
+        'title' => [
             'inputType' => 'text',
             'eval' => [
                 'mandatory' => true,
