@@ -3,6 +3,7 @@
 use Contao\DC_Table;
 use Contao\Input;
 use Contao\DataContainer;
+use Contao\Database;
 
 $GLOBALS['TL_DCA']['tl_course_date'] = [
   'config' => [
@@ -210,6 +211,8 @@ class tl_course_date
   public function validateEndDate($value, DataContainer $dc)
   {
     $startDate = Input::post('start_date');
+    $pid = $dc->activeRecord->pid ?? Input::get('pid');
+    $currentId = $dc->id;
 
     if ($startDate && $value) {
       $start = strtotime($startDate);
@@ -217,6 +220,22 @@ class tl_course_date
 
       if ($end < $start) {
         throw new \Exception('Das Enddatum darf nicht vor dem Startdatum liegen.');
+      }
+
+      $result = Database::getInstance()
+        ->prepare("
+                    SELECT id
+                    FROM tl_course_date
+                    WHERE pid = ?
+                    AND id != ?
+                    AND start_date <= ?
+                    AND end_date >= ?
+                    LIMIT 1
+                ")
+        ->execute($pid, $currentId ?: 0, $value, $startDate);
+
+      if ($result->numRows > 0) {
+        throw new \Exception('Der Kurstermin überschneidet sich mit einem bereits bestehenden Termin dieses Kurses.');
       }
     }
 
