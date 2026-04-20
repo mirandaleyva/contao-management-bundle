@@ -112,6 +112,7 @@ $GLOBALS['TL_DCA']['tl_course_date'] = [
       ],
       'save_callback' => [
         ['tl_course_date', 'validateEndDate'],
+        ['tl_course_date', 'validateDateOverlap'],
       ],
       'sql' => "varchar(10) NOT NULL default ''",
     ],
@@ -211,8 +212,6 @@ class tl_course_date
   public function validateEndDate($value, DataContainer $dc)
   {
     $startDate = \Contao\Input::post('start_date') ?: $dc->activeRecord->start_date;
-    $pid = $dc->activeRecord->pid ?? \Contao\Input::get('pid');
-    $currentId = $dc->id;
 
     if ($startDate && $value) {
       $start = strtotime($startDate);
@@ -221,21 +220,41 @@ class tl_course_date
       if ($end < $start) {
         throw new \Exception('Das Enddatum darf nicht vor dem Startdatum liegen.');
       }
+    }
 
-      $result = \Contao\Database::getInstance()
-        ->prepare("
-                    SELECT id
-                    FROM tl_course_date
-                    WHERE pid = ?
-                    AND id != ?
-                    AND start_date <= ?
-                    AND end_date >= ?
-                ")
-        ->execute($pid, $currentId ?: 0, $value, $startDate);
+    return $value;
+  }
 
-      if ($result->numRows > 0) {
-        throw new \Exception('Der Kurstermin überschneidet sich mit einem bestehenden Termin.');
-      }
+  public function validateDateOverlap($value, DataContainer $dc)
+  {
+    $startDate = \Contao\Input::post('start_date') ?: $dc->activeRecord->start_date;
+    $pid = $dc->activeRecord->pid ?? \Contao\Input::get('pid');
+    $currentId = $dc->id;
+
+    if (!$startDate || !$value || !$pid) {
+      return $value;
+    }
+
+    $start = strtotime($startDate);
+    $end = strtotime($value);
+
+    if ($end < $start) {
+      return $value;
+    }
+
+    $result = \Contao\Database::getInstance()
+      ->prepare("
+                SELECT id
+                FROM tl_course_date
+                WHERE pid = ?
+                AND id != ?
+                AND start_date <= ?
+                AND end_date >= ?
+            ")
+      ->execute($pid, $currentId ?: 0, $value, $startDate);
+
+    if ($result->numRows > 0) {
+      throw new \Exception('Der Kurstermin überschneidet sich mit einem bestehenden Termin.');
     }
 
     return $value;
