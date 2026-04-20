@@ -1,6 +1,8 @@
 <?php
 
 use Contao\DC_Table;
+use Contao\Input;
+use Contao\DataContainer;
 
 $GLOBALS['TL_DCA']['tl_course_date'] = [
   'config' => [
@@ -203,13 +205,11 @@ $GLOBALS['TL_DCA']['tl_course_date'] = [
   ],
 ];
 
-use Contao\DataContainer;
-
 class tl_course_date
 {
   public function validateEndDate($value, DataContainer $dc)
   {
-    $startDate = $dc->activeRecord->start_date ?? null;
+    $startDate = Input::post('start_date');
 
     if ($startDate && $value) {
       $start = strtotime($startDate);
@@ -225,8 +225,8 @@ class tl_course_date
 
   public function validateEndTime($value, DataContainer $dc)
   {
-    $addTime = $dc->activeRecord->add_time ?? null;
-    $startTime = $dc->activeRecord->start_time ?? null;
+    $addTime = Input::post('add_time');
+    $startTime = Input::post('start_time');
 
     if ($addTime && $startTime && $value) {
       if (strtotime($value) <= strtotime($startTime)) {
