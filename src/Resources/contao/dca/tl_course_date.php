@@ -107,6 +107,9 @@ $GLOBALS['TL_DCA']['tl_course_date'] = [
         'tl_class' => 'w50 wizard',
         'mandatory' => true,
       ],
+      'save_callback' => [
+        ['tl_course_date', 'validateEndDate'],
+      ],
       'sql' => "varchar(10) NOT NULL default ''",
     ],
     'add_time' => [
@@ -139,6 +142,9 @@ $GLOBALS['TL_DCA']['tl_course_date'] = [
         'placeholder' => 'HH:MM',
         'tl_class' => 'w50 wizard',
         'mandatory' => true,
+      ],
+      'save_callback' => [
+        ['tl_course_date', 'validateEndDate'],
       ],
       'sql' => "varchar(5) NOT NULL default ''",
     ],
@@ -196,3 +202,38 @@ $GLOBALS['TL_DCA']['tl_course_date'] = [
     ],
   ],
 ];
+
+use Contao\DataContainer;
+
+class tl_course_date
+{
+  public function validateEndDate($value, DataContainer $dc)
+  {
+    $startDate = $dc->activeRecord->start_date ?? null;
+
+    if ($startDate && $value) {
+      $start = strtotime($startDate);
+      $end = strtotime($value);
+
+      if ($end < $start) {
+        throw new \Exception('Das Enddatum darf nicht vor dem Startdatum liegen.');
+      }
+    }
+
+    return $value;
+  }
+
+  public function validateEndTime($value, DataContainer $dc)
+  {
+    $addTime = $dc->activeRecord->add_time ?? null;
+    $startTime = $dc->activeRecord->start_time ?? null;
+
+    if ($addTime && $startTime && $value) {
+      if (strtotime($value) <= strtotime($startTime)) {
+        throw new \Exception('Die Endzeit muss nach der Startzeit liegen.');
+      }
+    }
+
+    return $value;
+  }
+}
