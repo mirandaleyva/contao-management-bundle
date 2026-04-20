@@ -3,6 +3,7 @@
 $GLOBALS['TL_LANG']['tl_course']['title'] = ['Title', 'Enter the course name.'];
 $GLOBALS['TL_LANG']['tl_course']['form_reference'] = ['Form', 'Select the related form.'];
 $GLOBALS['TL_LANG']['tl_course']['published'] = ['Published', 'Make the course visible in the frontend.'];
+$GLOBALS['TL_LANG']['tl_course']['course_dates'] = ['Course dates', 'Manage the course dates of this course'];
 
 $GLOBALS['TL_LANG']['tl_course']['title_legend'] = 'Course data';
 $GLOBALS['TL_LANG']['tl_course']['publish_legend'] = 'Publishing';

@@ -22,7 +22,6 @@ $GLOBALS['TL_DCA']['tl_course_date'] = [
             'flag' => 1,
             'panelLayout' => 'sort,filter;search,limit',
             'headerFields' => ['title'],
-            'child_record_callback' => null,
         ],
         'label' => [
             'fields' => ['start_date', 'start_time', 'end_date', 'end_time'],

@@ -37,6 +37,11 @@ $GLOBALS['TL_DCA']['tl_course'] = [
                 'href' => 'act=edit',
                 'icon' => 'edit.svg',
             ],
+            'course_dates' => [
+                'label' => &$GLOBALS['TL_LANG']['tl_course']['course_dates'],
+                'href' => 'table=tl_course_date',
+                'icon' => 'children.svg',
+            ],
             'copy' => [
                 'href' => 'act=paste&amp;mode=copy',
                 'icon' => 'copy.svg',
