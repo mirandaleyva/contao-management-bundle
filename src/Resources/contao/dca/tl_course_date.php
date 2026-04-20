@@ -210,7 +210,9 @@ class tl_course_date
 {
   public function validateEndDate($value, DataContainer $dc)
   {
-    $startDate = $dc->activeRecord->start_date ?? \Contao\Input::post('start_date');
+    $startDate = \Contao\Input::post('start_date') ?: $dc->activeRecord->start_date;
+    $pid = $dc->activeRecord->pid ?? \Contao\Input::get('pid');
+    $currentId = $dc->id;
 
     if ($startDate && $value) {
       $start = strtotime($startDate);
@@ -220,18 +222,15 @@ class tl_course_date
         throw new \Exception('Das Enddatum darf nicht vor dem Startdatum liegen.');
       }
 
-      // Überschneidungsprüfung
-      $pid = $dc->activeRecord->pid ?? \Contao\Input::get('pid');
-      $currentId = $dc->id;
-
       $result = \Contao\Database::getInstance()
         ->prepare("
-                SELECT id FROM tl_course_date
-                WHERE pid = ?
-                AND id != ?
-                AND start_date <= ?
-                AND end_date >= ?
-            ")
+                    SELECT id
+                    FROM tl_course_date
+                    WHERE pid = ?
+                    AND id != ?
+                    AND start_date <= ?
+                    AND end_date >= ?
+                ")
         ->execute($pid, $currentId ?: 0, $value, $startDate);
 
       if ($result->numRows > 0) {
@@ -244,8 +243,8 @@ class tl_course_date
 
   public function validateEndTime($value, DataContainer $dc)
   {
-    $addTime = Input::post('add_time');
-    $startTime = Input::post('start_time');
+    $addTime = \Contao\Input::post('add_time');
+    $startTime = \Contao\Input::post('start_time');
 
     if ($addTime && $startTime && $value) {
       if (strtotime($value) <= strtotime($startTime)) {
