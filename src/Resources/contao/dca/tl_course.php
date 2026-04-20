@@ -1,6 +1,7 @@
 <?php
 
 use Contao\DC_Table;
+use Contao\FormModel;
 
 $GLOBALS['TL_DCA']['tl_course'] = [
   'config' => [
@@ -60,12 +61,13 @@ $GLOBALS['TL_DCA']['tl_course'] = [
 
   'palettes' => [
     'default' => '
-        {general_legend},title,author;
-        {description_legend},description;
-        {media_legend},preview_image,form_reference;
-        {publish_legend},published
-    ',
+            {general_legend},title,author;
+            {description_legend},description;
+            {media_legend},preview_image,form_reference;
+            {publish_legend},published
+        ',
   ],
+
   'fields' => [
     'id' => [
       'sql' => "int(10) unsigned NOT NULL auto_increment",
@@ -77,6 +79,7 @@ $GLOBALS['TL_DCA']['tl_course'] = [
       'sql' => "int(10) unsigned NOT NULL default 0",
     ],
     'title' => [
+      'label' => &$GLOBALS['TL_LANG']['tl_course']['title'],
       'inputType' => 'text',
       'eval' => [
         'mandatory' => true,
@@ -127,6 +130,7 @@ $GLOBALS['TL_DCA']['tl_course'] = [
       'sql' => "int(10) unsigned NOT NULL default 0",
     ],
     'published' => [
+      'label' => &$GLOBALS['TL_LANG']['tl_course']['published'],
       'inputType' => 'checkbox',
       'eval' => [
         'tl_class' => 'w50 m12',
@@ -135,8 +139,6 @@ $GLOBALS['TL_DCA']['tl_course'] = [
     ],
   ],
 ];
-
-use Contao\FormModel;
 
 class tl_course
 {
