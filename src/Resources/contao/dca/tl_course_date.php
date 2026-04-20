@@ -24,7 +24,7 @@ $GLOBALS['TL_DCA']['tl_course_date'] = [
       'headerFields' => ['title'],
     ],
     'label' => [
-      'fields' => ['start_date', 'end_date', 'location'],
+      'fields' => ['start_date', 'end_date', 'venue'],
       'format' => '%s - %s | %s',
     ],
     'global_operations' => [
@@ -59,10 +59,10 @@ $GLOBALS['TL_DCA']['tl_course_date'] = [
     '__selector__' => ['add_time'],
 
     'default' => '
-        {date_legend},start_date,end_date,add_time;
-        {location_legend},location;
-        {status_legend},fully_booked,published
-    ',
+            {date_legend},start_date,end_date,add_time;
+            {location_legend},venue,postal_code,street,house_number;
+            {status_legend},fully_booked,published
+        ',
   ],
 
   'subpalettes' => [
@@ -88,6 +88,7 @@ $GLOBALS['TL_DCA']['tl_course_date'] = [
       'sql' => "int(10) unsigned NOT NULL default 0",
     ],
     'start_date' => [
+      'label' => &$GLOBALS['TL_LANG']['tl_course_date']['start_date'],
       'inputType' => 'text',
       'eval' => [
         'rgxp' => 'date',
@@ -98,6 +99,7 @@ $GLOBALS['TL_DCA']['tl_course_date'] = [
       'sql' => "varchar(10) NOT NULL default ''",
     ],
     'end_date' => [
+      'label' => &$GLOBALS['TL_LANG']['tl_course_date']['end_date'],
       'inputType' => 'text',
       'eval' => [
         'rgxp' => 'date',
@@ -108,6 +110,7 @@ $GLOBALS['TL_DCA']['tl_course_date'] = [
       'sql' => "varchar(10) NOT NULL default ''",
     ],
     'add_time' => [
+      'label' => &$GLOBALS['TL_LANG']['tl_course_date']['add_time'],
       'inputType' => 'checkbox',
       'eval' => [
         'submitOnChange' => true,
@@ -116,34 +119,67 @@ $GLOBALS['TL_DCA']['tl_course_date'] = [
       'sql' => "char(1) NOT NULL default ''",
     ],
     'start_time' => [
+      'label' => &$GLOBALS['TL_LANG']['tl_course_date']['start_time'],
       'inputType' => 'text',
       'eval' => [
         'rgxp' => 'time',
         'timepicker' => true,
+        'placeholder' => 'HH:MM',
         'tl_class' => 'w50 wizard',
         'mandatory' => true,
       ],
       'sql' => "varchar(5) NOT NULL default ''",
     ],
     'end_time' => [
+      'label' => &$GLOBALS['TL_LANG']['tl_course_date']['end_time'],
       'inputType' => 'text',
       'eval' => [
         'rgxp' => 'time',
         'timepicker' => true,
+        'placeholder' => 'HH:MM',
         'tl_class' => 'w50 wizard',
         'mandatory' => true,
       ],
       'sql' => "varchar(5) NOT NULL default ''",
     ],
-    'location' => [
+    'venue' => [
+      'label' => &$GLOBALS['TL_LANG']['tl_course_date']['venue'],
       'inputType' => 'text',
       'eval' => [
         'maxlength' => 255,
-        'tl_class' => 'clr long',
+        'tl_class' => 'w50',
       ],
       'sql' => "varchar(255) NOT NULL default ''",
     ],
+    'postal_code' => [
+      'label' => &$GLOBALS['TL_LANG']['tl_course_date']['postal_code'],
+      'inputType' => 'text',
+      'eval' => [
+        'maxlength' => 20,
+        'tl_class' => 'w50',
+      ],
+      'sql' => "varchar(20) NOT NULL default ''",
+    ],
+    'street' => [
+      'label' => &$GLOBALS['TL_LANG']['tl_course_date']['street'],
+      'inputType' => 'text',
+      'eval' => [
+        'maxlength' => 255,
+        'tl_class' => 'w50',
+      ],
+      'sql' => "varchar(255) NOT NULL default ''",
+    ],
+    'house_number' => [
+      'label' => &$GLOBALS['TL_LANG']['tl_course_date']['house_number'],
+      'inputType' => 'text',
+      'eval' => [
+        'maxlength' => 20,
+        'tl_class' => 'w50',
+      ],
+      'sql' => "varchar(20) NOT NULL default ''",
+    ],
     'fully_booked' => [
+      'label' => &$GLOBALS['TL_LANG']['tl_course_date']['fully_booked'],
       'inputType' => 'checkbox',
       'eval' => [
         'tl_class' => 'w50 m12',
@@ -151,6 +187,7 @@ $GLOBALS['TL_DCA']['tl_course_date'] = [
       'sql' => "char(1) NOT NULL default ''",
     ],
     'published' => [
+      'label' => &$GLOBALS['TL_LANG']['tl_course_date']['published'],
       'inputType' => 'checkbox',
       'eval' => [
         'tl_class' => 'w50 m12',
