@@ -3,9 +3,9 @@
 namespace MirandaLeyva\ContaoCourseManagementBundle\Controller\FrontendModule;
 
 use Contao\CoreBundle\Controller\FrontendModule\AbstractFrontendModuleController;
-use Contao\ModuleModel;
 use Contao\CoreBundle\Twig\FragmentTemplate;
 use Contao\Database;
+use Contao\ModuleModel;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 
@@ -42,18 +42,25 @@ class CourseListController extends AbstractFrontendModuleController
       $dates = [];
 
       while ($datesResult->next()) {
+        $addressParts = array_filter([
+          $datesResult->street,
+          $datesResult->house_number,
+          trim(($datesResult->postal_code ?: '') . ' ' . ($datesResult->venue ?: '')),
+        ]);
+
         $dates[] = [
           'id' => $datesResult->id,
           'start_date' => $datesResult->start_date,
           'end_date' => $datesResult->end_date,
-          'add_time' => $datesResult->add_time,
+          'add_time' => (bool) $datesResult->add_time,
           'start_time' => $datesResult->start_time,
           'end_time' => $datesResult->end_time,
           'venue' => $datesResult->venue,
           'postal_code' => $datesResult->postal_code,
           'street' => $datesResult->street,
           'house_number' => $datesResult->house_number,
-          'fully_booked' => $datesResult->fully_booked,
+          'location' => implode(', ', $addressParts),
+          'fully_booked' => (bool) $datesResult->fully_booked,
         ];
       }
 
@@ -72,8 +79,8 @@ class CourseListController extends AbstractFrontendModuleController
       ];
     }
 
-    $template->courses = $courses;
-    $template->empty = empty($courses);
+    $template->set('courses', $courses);
+    $template->set('empty', empty($courses));
 
     return $template->getResponse();
   }
