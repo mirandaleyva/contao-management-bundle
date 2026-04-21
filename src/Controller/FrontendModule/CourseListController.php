@@ -4,14 +4,14 @@ namespace MirandaLeyva\ContaoCourseManagementBundle\Controller\FrontendModule;
 
 use Contao\CoreBundle\Controller\FrontendModule\AbstractFrontendModuleController;
 use Contao\ModuleModel;
-use Contao\Template;
+use Contao\CoreBundle\Twig\FragmentTemplate;
 use Contao\Database;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 
 class CourseListController extends AbstractFrontendModuleController
 {
-  protected function getResponse(Template $template, ModuleModel $model, Request $request): Response
+  protected function getResponse(FragmentTemplate $template, ModuleModel $model, Request $request): Response
   {
     $order = $model->course_order === 'desc' ? 'DESC' : 'ASC';
     $today = date('Y-m-d');
