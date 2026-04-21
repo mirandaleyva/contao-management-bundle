@@ -7,14 +7,11 @@ $GLOBALS['TL_DCA']['tl_module']['fields']['course_order'] = [
   'label' => &$GLOBALS['TL_LANG']['tl_module']['course_order'],
   'exclude' => true,
   'inputType' => 'select',
-  'options' => [
-    'asc',
-    'desc',
-  ],
+  'options' => ['asc', 'desc'],
   'reference' => &$GLOBALS['TL_LANG']['tl_module']['course_order_options'],
   'eval' => [
     'tl_class' => 'w50',
-    'includeBlankOption' => false,
+    'mandatory' => true,
   ],
   'sql' => "varchar(4) NOT NULL default 'asc'",
 ];
