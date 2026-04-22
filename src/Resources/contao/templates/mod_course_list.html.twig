@@ -7,7 +7,17 @@
                 <h2>{{ course.title }}</h2>
 
                 {% if course.author %}
-                    <p><strong>{{ labels.author }}:</strong> {{ course.author }}</p>
+                    <p>
+                        <strong>{{ labels.author }}:</strong>
+                        {{ course.author }}
+                    </p>
+                {% endif %}
+
+                {% if course.next_date %}
+                    <p>
+                        <strong>{{ labels.next_date }}:</strong>
+                        {{ course.next_date }}
+                    </p>
                 {% endif %}
 
                 {% if course.description %}
@@ -17,9 +27,9 @@
                 {% endif %}
 
                 {% if course.detail_url %}
-                    <a href="{{ course.detail_url }}" class="course-link">
-                        {{ labels.details }}
-                    </a>
+                    <p>
+                        <a href="{{ course.detail_url }}">{{ labels.details }}</a>
+                    </p>
                 {% endif %}
             </article>
         {% endfor %}
