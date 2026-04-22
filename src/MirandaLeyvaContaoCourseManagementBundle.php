@@ -11,7 +11,7 @@ class MirandaLeyvaContaoCourseManagementBundle extends AbstractBundle
   public function loadExtension(
     array $config,
     ContainerConfigurator $containerConfigurator,
-    ContainerBuilder $containerBuilder
+    ContainerBuilder $containerBuilder,
   ): void {
     $containerConfigurator->import(__DIR__ . '/Resources/config/services.yaml');
   }
