@@ -10,6 +10,7 @@ use Contao\ModuleModel;
 use Contao\System;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
+use Contao\PageModel;
 
 #[AsFrontendModule(type: 'course_list', category: 'courses', template: 'mod_course_management')]
 class CourseListController extends AbstractFrontendModuleController

@@ -1,0 +1,27 @@
+{% if empty %}
+    <p>{{ labels.empty }}</p>
+{% else %}
+    <div class="course-list">
+        {% for course in courses %}
+            <article class="course-item">
+                <h2>{{ course.title }}</h2>
+
+                {% if course.author %}
+                    <p><strong>{{ labels.author }}:</strong> {{ course.author }}</p>
+                {% endif %}
+
+                {% if course.description %}
+                    <div class="course-description">
+                        {{ course.description|raw }}
+                    </div>
+                {% endif %}
+
+                {% if course.detail_url %}
+                    <a href="{{ course.detail_url }}" class="course-link">
+                        {{ labels.details }}
+                    </a>
+                {% endif %}
+            </article>
+        {% endfor %}
+    </div>
+{% endif %}
