@@ -23,3 +23,14 @@ $GLOBALS['TL_LANG']['MSC']['course_list_location'] = 'Location';
 $GLOBALS['TL_LANG']['MSC']['course_list_status'] = 'Status';
 $GLOBALS['TL_LANG']['MSC']['course_list_fully_booked'] = 'Fully booked';
 $GLOBALS['TL_LANG']['MSC']['course_list_available'] = 'Available';
+
+$GLOBALS['TL_LANG']['MSC']['course_reader_author'] = 'Author';
+$GLOBALS['TL_LANG']['MSC']['course_reader_dates'] = 'Dates & registration';
+$GLOBALS['TL_LANG']['MSC']['course_reader_no_dates'] = 'There are currently no upcoming dates available.';
+$GLOBALS['TL_LANG']['MSC']['course_reader_date'] = 'Date';
+$GLOBALS['TL_LANG']['MSC']['course_reader_time'] = 'Time';
+$GLOBALS['TL_LANG']['MSC']['course_reader_location'] = 'Location';
+$GLOBALS['TL_LANG']['MSC']['course_reader_status'] = 'Status';
+$GLOBALS['TL_LANG']['MSC']['course_reader_fully_booked'] = 'Fully booked';
+$GLOBALS['TL_LANG']['MSC']['course_reader_available'] = 'Available';
+$GLOBALS['TL_LANG']['MSC']['course_reader_register'] = 'Register now';

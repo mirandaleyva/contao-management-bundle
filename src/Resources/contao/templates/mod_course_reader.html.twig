@@ -1,0 +1,80 @@
+{% if empty %}
+    <p>{{ message }}</p>
+{% else %}
+    <article class="course-reader">
+        <h1>{{ course.title }}</h1>
+
+        {% if course.preview_image %}
+            <div class="course-image">
+                <img src="{{ course.preview_image }}" alt="{{ course.title }}">
+            </div>
+        {% endif %}
+
+        {% if course.author %}
+            <p>
+                <strong>{{ labels.author }}:</strong>
+                {{ course.author }}
+            </p>
+        {% endif %}
+
+        {% if course.description %}
+            <div class="course-description">
+                {{ course.description|raw }}
+            </div>
+        {% endif %}
+
+        <div class="course-dates">
+            <h2>{{ labels.course_dates }}</h2>
+
+            {% if course.dates is empty %}
+                <p>{{ labels.no_dates }}</p>
+            {% else %}
+                <ul>
+                    {% for date in course.dates %}
+                        <li>
+                            <div>
+                                <strong>{{ labels.date }}:</strong>
+                                {{ date.start_date }}
+                                {% if date.end_date and date.end_date != date.start_date %}
+                                    – {{ date.end_date }}
+                                {% endif %}
+                            </div>
+
+                            {% if date.add_time %}
+                                <div>
+                                    <strong>{{ labels.time }}:</strong>
+                                    {{ date.start_time }}
+                                    {% if date.end_time %}
+                                        – {{ date.end_time }}
+                                    {% endif %}
+                                </div>
+                            {% endif %}
+
+                            {% if date.location %}
+                                <div>
+                                    <strong>{{ labels.location }}:</strong>
+                                    {{ date.location }}
+                                </div>
+                            {% endif %}
+
+                            <div>
+                                <strong>{{ labels.status }}:</strong>
+                                {% if date.fully_booked %}
+                                    {{ labels.fully_booked }}
+                                {% else %}
+                                    {{ labels.available }}
+                                {% endif %}
+                            </div>
+
+                            {% if date.registration_url and not date.fully_booked %}
+                                <div>
+                                    <a href="{{ date.registration_url }}">{{ labels.register }}</a>
+                                </div>
+                            {% endif %}
+                        </li>
+                    {% endfor %}
+                </ul>
+            {% endif %}
+        </div>
+    </article>
+{% endif %}
