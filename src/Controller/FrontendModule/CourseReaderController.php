@@ -11,6 +11,9 @@ use Contao\PageModel;
 use Contao\System;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
+use Contao\FilesModel;
+use Contao\StringUtil;
+
 
 #[AsFrontendModule(type: 'course_reader', category: 'courses', template: 'mod_course_reader')]
 class CourseReaderController extends AbstractFrontendModuleController
@@ -113,12 +116,23 @@ class CourseReaderController extends AbstractFrontendModuleController
       return $date;
     }, $dates);
 
+    $previewImage = null;
+
+    if ($courseResult->preview_image) {
+      $uuid = StringUtil::binToUuid($courseResult->preview_image);
+      $file = FilesModel::findByUuid($uuid);
+
+      if ($file !== null) {
+        $previewImage = $file->path;
+      }
+    }
+
     $course = [
       'id' => $courseResult->id,
       'title' => $courseResult->title,
       'author' => $courseResult->author,
       'description' => $courseResult->description,
-      'preview_image' => $courseResult->preview_image,
+      'preview_image' => $previewImage,
       'form_reference' => $courseResult->form_reference,
       'dates' => $dates,
     ];
