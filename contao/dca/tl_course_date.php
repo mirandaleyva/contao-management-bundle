@@ -262,6 +262,7 @@ class tl_course_date
       return $value;
     }
 
+    // Ungültigen Datumsbereich hier nicht nochmals als Überschneidung behandeln
     if ($end < $start) {
       return $value;
     }
@@ -272,50 +273,53 @@ class tl_course_date
             FROM tl_course_date
             WHERE pid = ?
               AND id != ?
-              AND start_date <= ?
-              AND end_date >= ?
         ")
-      ->execute($pid, $currentId, $end, $start);
+      ->execute($pid, $currentId);
 
     while ($result->next()) {
-      $existingStart = (int) $result->start_date;
-      $existingEnd = (int) $result->end_date;
+      $existingStart = is_numeric($result->start_date)
+        ? (int) $result->start_date
+        : strtotime($result->start_date);
 
-      if (!is_numeric($result->start_date)) {
-        $existingStart = strtotime($result->start_date);
-      }
-      if (!is_numeric($result->end_date)) {
-        $existingEnd = strtotime($result->end_date);
-      }
+      $existingEnd = is_numeric($result->end_date)
+        ? (int) $result->end_date
+        : strtotime($result->end_date);
 
       if ($existingStart === false || $existingEnd === false) {
         continue;
       }
 
-      if ($existingStart > $end || $existingEnd < $start) {
+      // 1. Datumsüberschneidung prüfen
+      $datesOverlap = ($existingStart <= $end && $existingEnd >= $start);
+
+      if (!$datesOverlap) {
         continue;
       }
 
       $existingHasTime = !empty($result->add_time) && !empty($result->start_time) && !empty($result->end_time);
       $newHasTime = !empty($addTime) && !empty($startTime) && !empty($endTime);
 
+      // 2. Wenn beide Termine Zeiten haben und beide exakt am selben Tag sind:
+      //    zusätzlich die Zeitfenster prüfen
       if ($existingHasTime && $newHasTime && $existingStart === $start && $existingEnd === $end) {
-        $newStartMinutes = $this->timeToMinutes($startTime);
-        $newEndMinutes = $this->timeToMinutes($endTime);
-
         $existingStartMinutes = $this->timeToMinutes($result->start_time);
         $existingEndMinutes = $this->timeToMinutes($result->end_time);
 
-        if (
-          $newStartMinutes < $existingEndMinutes &&
-          $newEndMinutes > $existingStartMinutes
-        ) {
+        $newStartMinutes = $this->timeToMinutes($startTime);
+        $newEndMinutes = $this->timeToMinutes($endTime);
+
+        $timesOverlap = ($newStartMinutes < $existingEndMinutes && $newEndMinutes > $existingStartMinutes);
+
+        if ($timesOverlap) {
           throw new \Exception('Der Kurstermin überschneidet sich mit einem bestehenden Termin.');
         }
 
+        // gleiches Datum, aber keine Zeitüberschneidung
         continue;
       }
 
+      // 3. Wenn keine Zeit vorhanden ist oder mehrere Tage betroffen sind:
+      //    Datumsüberschneidung reicht aus
       throw new \Exception('Der Kurstermin überschneidet sich mit einem bestehenden Termin.');
     }
 
@@ -332,6 +336,7 @@ class tl_course_date
 
     return ((int) date('H', $timestamp) * 60) + (int) date('i', $timestamp);
   }
+
 
   public function validateTimeRange($value, DataContainer $dc)
   {
