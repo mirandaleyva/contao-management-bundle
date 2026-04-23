@@ -243,6 +243,7 @@ class tl_course_date
   {
     $startDate = Input::post('start_date') ?: ($dc->activeRecord->start_date ?? null);
     $endDate = Input::post('end_date') ?: ($dc->activeRecord->end_date ?? null);
+
     $pid = $dc->activeRecord->pid ?? Input::get('pid');
     $currentId = $dc->id ?? 0;
 
@@ -257,20 +258,21 @@ class tl_course_date
       return $value;
     }
 
+    // ❗ WICHTIG: zuerst Datumsvalidierung
     if ($end < $start) {
       return $value;
     }
 
     $result = Database::getInstance()
       ->prepare("
-                SELECT id
-                FROM tl_course_date
-                WHERE pid = ?
-                AND id != ?
-                AND start_date <= ?
-                AND end_date >= ?
-            ")
-      ->execute($pid, $currentId, $endDate, $startDate);
+            SELECT id
+            FROM tl_course_date
+            WHERE pid = ?
+            AND id != ?
+            AND start_date <= ?
+            AND end_date >= ?
+        ")
+      ->execute($pid, $currentId, $end, $start);
 
     if ($result->numRows > 0) {
       throw new \Exception('Der Kurstermin überschneidet sich mit einem bestehenden Termin.');
