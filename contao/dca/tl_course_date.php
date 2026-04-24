@@ -255,17 +255,16 @@ class tl_course_date
       return $value;
     }
 
-    $start = strtotime($startDate);
-    $end = strtotime($endDate);
+    $newStartDate = $this->normalizeDate($startDate);
+    $newEndDate = $this->normalizeDate($endDate);
 
-    if ($start === false || $end === false) {
+    if ($newStartDate === null || $newEndDate === null || $newEndDate < $newStartDate) {
       return $value;
     }
 
-    // Ungültigen Datumsbereich hier nicht nochmals als Überschneidung behandeln
-    if ($end < $start) {
-      return $value;
-    }
+    $newHasTime = (bool) $addTime && $startTime && $endTime;
+    $newStartTime = $newHasTime ? $this->normalizeTime($startTime) : 0;
+    $newEndTime = $newHasTime ? $this->normalizeTime($endTime) : 86400;
 
     $result = Database::getInstance()
       ->prepare("
@@ -277,53 +276,65 @@ class tl_course_date
       ->execute($pid, $currentId);
 
     while ($result->next()) {
-      $existingStart = is_numeric($result->start_date)
-        ? (int) $result->start_date
-        : strtotime($result->start_date);
+      $existingStartDate = $this->normalizeDate($result->start_date);
+      $existingEndDate = $this->normalizeDate($result->end_date);
 
-      $existingEnd = is_numeric($result->end_date)
-        ? (int) $result->end_date
-        : strtotime($result->end_date);
-
-      if ($existingStart === false || $existingEnd === false) {
+      if ($existingStartDate === null || $existingEndDate === null) {
         continue;
       }
 
-      // 1. Datumsüberschneidung prüfen
-      $datesOverlap = ($existingStart <= $end && $existingEnd >= $start);
+      $datesOverlap = $existingStartDate <= $newEndDate && $existingEndDate >= $newStartDate;
 
       if (!$datesOverlap) {
         continue;
       }
 
-      $existingHasTime = !empty($result->add_time) && !empty($result->start_time) && !empty($result->end_time);
-      $newHasTime = !empty($addTime) && !empty($startTime) && !empty($endTime);
+      $existingHasTime = (bool) $result->add_time && $result->start_time && $result->end_time;
+      $existingStartTime = $existingHasTime ? $this->normalizeTime($result->start_time) : 0;
+      $existingEndTime = $existingHasTime ? $this->normalizeTime($result->end_time) : 86400;
 
-      // 2. Wenn beide Termine Zeiten haben und beide exakt am selben Tag sind:
-      //    zusätzlich die Zeitfenster prüfen
-      if ($existingHasTime && $newHasTime && $existingStart === $start && $existingEnd === $end) {
-        $existingStartMinutes = $this->timeToMinutes($result->start_time);
-        $existingEndMinutes = $this->timeToMinutes($result->end_time);
+      $timesOverlap = $existingStartTime < $newEndTime && $existingEndTime > $newStartTime;
 
-        $newStartMinutes = $this->timeToMinutes($startTime);
-        $newEndMinutes = $this->timeToMinutes($endTime);
-
-        $timesOverlap = ($newStartMinutes < $existingEndMinutes && $newEndMinutes > $existingStartMinutes);
-
-        if ($timesOverlap) {
-          throw new \Exception('Der Kurstermin überschneidet sich mit einem bestehenden Termin.');
-        }
-
-        // gleiches Datum, aber keine Zeitüberschneidung
-        continue;
+      if ($timesOverlap) {
+        throw new \Exception('Der Kurstermin überschneidet sich mit einem bestehenden Termin.');
       }
-
-      // 3. Wenn keine Zeit vorhanden ist oder mehrere Tage betroffen sind:
-      //    Datumsüberschneidung reicht aus
-      throw new \Exception('Der Kurstermin überschneidet sich mit einem bestehenden Termin.');
     }
 
     return $value;
+  }
+
+  private function normalizeDate($value): ?int
+  {
+    if (!$value) {
+      return null;
+    }
+
+    if (is_numeric($value)) {
+      return strtotime(date('Y-m-d', (int) $value));
+    }
+
+    $timestamp = strtotime($value);
+
+    return $timestamp === false ? null : strtotime(date('Y-m-d', $timestamp));
+  }
+
+  private function normalizeTime($value): int
+  {
+    if (!$value) {
+      return 0;
+    }
+
+    if (is_numeric($value)) {
+      return (int) $value;
+    }
+
+    $timestamp = strtotime($value);
+
+    if ($timestamp === false) {
+      return 0;
+    }
+
+    return ((int) date('H', $timestamp) * 3600) + ((int) date('i', $timestamp) * 60);
   }
 
   private function timeToMinutes(string $time): int
