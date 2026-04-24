@@ -268,11 +268,11 @@ class tl_course_date
 
     $result = Database::getInstance()
       ->prepare("
-            SELECT id, start_date, end_date, add_time, start_time, end_time
-            FROM tl_course_date
-            WHERE pid = ?
-              AND id != ?
-        ")
+      SELECT id, start_date, end_date, add_time, start_time, end_time
+      FROM tl_course_date
+      WHERE pid = ?
+        AND id != ?
+    ")
       ->execute($pid, $currentId);
 
     while ($result->next()) {
@@ -292,6 +292,11 @@ class tl_course_date
       $existingHasTime = (bool) $result->add_time && $result->start_time && $result->end_time;
       $existingStartTime = $existingHasTime ? $this->normalizeTime($result->start_time) : 0;
       $existingEndTime = $existingHasTime ? $this->normalizeTime($result->end_time) : 86400;
+
+      // Wenn einer der Termine keine Uhrzeit hat, gilt er als ganztägig.
+      if (!$existingHasTime || !$newHasTime) {
+        throw new \Exception('Der Kurstermin überschneidet sich mit einem bestehenden Termin.');
+      }
 
       $timesOverlap = $existingStartTime < $newEndTime && $existingEndTime > $newStartTime;
 
